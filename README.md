@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+NoteHub (Next.js)
 
-## Getting Started
+Застосунок перенесено зі SPA на багатосторінкову структуру Next.js App Router з маршрутизацією:
 
-First, run the development server:
+/ — головна сторінка з описом застосунку.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+/notes — сторінка зі списком нотаток: відображення всіх нотаток, пошук за ключовим словом, створення нової нотатки.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+/notes/[id] — сторінка деталей нотатки (динамічний маршрут), показ повної інформації за id.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Спільний Layout
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Усі сторінки мають спільні компоненти:
 
-## Learn More
+Header з навігацією (Home / Notes) через next/link
 
-To learn more about Next.js, take a look at the following resources:
+Footer з контактною інформацією розробника
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Дані та API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+API-логіку перенесено в lib/api.ts (із попереднього noteService.ts)
 
-## Deploy on Vercel
+додано fetchNoteById для отримання деталей нотатки
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+використовується env-змінна NEXT_PUBLIC_NOTEHUB_TOKEN (process.env.NEXT_PUBLIC_NOTEHUB_TOKEN)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+типи винесені в types/note.ts
+
+TanStack Query + SSR
+
+Сторінки /notes та /notes/[id] реалізовані як SSR-компоненти з prefetch даних через TanStack Query і гідратацією кешу.
+Клієнтська логіка винесена в:
+
+app/notes/Notes.client.tsx
+
+app/notes/NoteDetails.client.tsx (отримання id через useParams())
+
+Глобально підключено QueryClientProvider через TanStackProvider у app/layout.tsx.
+
+Loading / Error
+
+глобальний loading.tsx: Loading, please wait...
+
+error.tsx для /notes: Could not fetch the list of notes. {error.message}
+
+error.tsx для /notes/[id]: Could not fetch note details. {error.message}
